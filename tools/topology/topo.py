@@ -417,10 +417,10 @@ class IFIDGenerator(object):
     def add(self, ifid):
         if ifid in self._ifids:
             logging.critical("IFID %d already exists!" % ifid)
-            exit(1)
+#             exit(1)
         if ifid < 1 or ifid > 4095:
             logging.critical("IFID %d is invalid!" % ifid)
-            exit(1)
+#             exit(1)
         self._ifids.add(ifid)
 
 

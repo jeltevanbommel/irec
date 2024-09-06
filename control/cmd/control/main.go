@@ -15,12 +15,17 @@
 package main
 
 import (
+	_ "net/http/pprof"
+
+	"github.com/go-chi/chi/v5/middleware"
+)
+
+import (
 	"context"
 	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"net/http"
-	_ "net/http/pprof"
 	"net/netip"
 	"path/filepath"
 	"strings"
@@ -684,7 +689,7 @@ func realMain(ctx context.Context) error {
 		}))
 		r.Get("/", api.ServeSpecInteractive)
 		r.Get("/openapi.json", api.ServeSpecJSON)
-		server := api.Server{
+		_ = api.Server{
 			SegmentsServer: segapi.Server{
 				Segments: pathDB,
 			},
@@ -708,13 +713,14 @@ func realMain(ctx context.Context) error {
 		log.Info("Exposing API", "addr", globalCfg.API.Addr)
 		s := http.Server{
 			Addr:    globalCfg.API.Addr,
-			Handler: api.HandlerFromMuxWithBaseURL(&server, r, "/api/v1"),
+			Handler: middleware.Profiler(),
 		}
 		g.Go(func() error {
 			defer log.HandlePanic()
 			if err := s.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 				return serrors.WrapStr("serving service management API", err)
 			}
+			http.ListenAndServe(strings.Split(globalCfg.API.Addr, ":")[0]+":6060", nil)
 			return nil
 		})
 		cleanup.Add(s.Close)

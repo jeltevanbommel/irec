@@ -4,7 +4,7 @@
 .DS_Store?
 ._*
 .Spotlight-V100
-.Trashes
+.Trashess
 ehthumbs.db
 Thumbs.db
 
@@ -103,3 +103,4 @@ logger.log
 # emacs backup files
 ####################
 *~
+/bazel-irec-dispatcherless/
